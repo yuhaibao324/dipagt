@@ -1,0 +1,118 @@
+{
+  "agent_tools": [
+    {
+      "agent_name": "Copilot",
+      "tools": [
+        {
+          "tool_name": "Answer",
+          "config": {
+            "default_style": "professional",
+            "default_format": "text"
+          }
+        }
+      ]
+    },
+    {
+      "agent_name": "Bob",
+      "tools": [
+        {
+          "tool_name": "TavilySearch",
+          "config": {
+            "max_results": 8,
+            "search_depth": "basic"
+          }
+        },
+        {
+          "tool_name": "WebContentFetcher",
+          "config": null
+        },
+        {
+          "tool_name": "BrowserUse",
+          "config": {
+            "headless": true
+          }
+        },
+        {
+          "tool_name": "Analyze",
+          "config": {
+            "default_analysis_type": "summary"
+          }
+        }
+      ]
+    },
+    {
+      "agent_name": "Alice",
+      "tools": [
+        {
+          "tool_name": "DesignGenerator",
+          "config": {
+            "default_style": "minimalist"
+          }
+        },
+        {
+          "tool_name": "TavilySearch",
+          "config": {
+            "max_results": 5,
+            "topic": "general",
+            "include_answer": true
+          }
+        },
+        {
+          "tool_name": "WebContentFetcher",
+          "config": null
+        },
+        {
+          "tool_name": "Analyze",
+          "config": {
+            "default_analysis_type": "summary"
+          }
+        }
+      ]
+    },
+    {
+      "agent_name": "Pliman",
+      "tools": [
+        {
+          "tool_name": "CodeWriter",
+          "config": {
+            "preferred_languages": ["python", "javascript", "typescript"]
+          }
+        },
+        {
+          "tool_name": "CommandLineTool",
+          "config": {
+            "allowed_commands": ["git", "npm", "pip", "python", "node"]
+          }
+        },
+        {
+          "tool_name": "TavilySearch",
+          "config": {
+            "max_results": 8,
+            "search_depth": "advanced",
+            "topic": "general"
+          }
+        },
+        {
+          "tool_name": "WebContentFetcher",
+          "config": null
+        },
+        {
+          "tool_name": "BrowserUse",
+          "config": {
+            "headless": true
+          }
+        },
+        {
+          "tool_name": "MCPTool",
+          "config": null
+        },
+        {
+          "tool_name": "Analyze",
+          "config": {
+            "default_analysis_type": "summary"
+          }
+        }
+      ]
+    }
+  ]
+}

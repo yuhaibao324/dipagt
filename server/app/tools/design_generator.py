@@ -1,0 +1,192 @@
+import os
+import json
+import base64
+from typing import Any, Dict, Optional, AsyncIterator
+import aiohttp
+import logging
+
+from .base_tool import BaseTool
+
+logger = logging.getLogger(__name__)
+
+class DesignGeneratorTool(BaseTool):
+    """
+    生成设计方案和原型的工具 (使用 DALL-E)
+    """
+    
+    def __init__(self):
+        super().__init__(
+            name="DesignGenerator",
+            description="生成设计方案和原型 (使用 DALL-E)"
+        )
+        self.api_key = None
+        self.model = "dall-e-3"
+        self.output_dir = "generated_designs"
+    
+    def configure(self, api_key: str, output_dir: Optional[str] = None, model: Optional[str] = None):
+        """
+        配置设计生成工具
+        
+        Args:
+            api_key: OpenAI API密钥（用于DALL-E生成）
+            output_dir: 设计输出目录
+            model: 使用的 DALL-E 模型 (e.g., "dall-e-3", "dall-e-2")
+        """
+        self.api_key = api_key
+        if output_dir:
+            self.output_dir = output_dir
+        if model:
+            self.model = model
+        
+        # 确保输出目录存在
+        try:
+            os.makedirs(self.output_dir, exist_ok=True)
+        except OSError as e:
+             logger.error(f"Failed to create output directory '{self.output_dir}': {e}")
+             # Tool might fail later if directory doesn't exist.
+    
+    async def _run(self, 
+                   design_type: str, 
+                   description: str, 
+                   style: str = "modern",
+                   **kwargs) -> AsyncIterator[Dict[str, Any]]:
+        """
+        生成设计并流式返回状态和结果
+        
+        Args:
+            design_type: 设计类型，如UI、logo、海报等
+            description: 设计需求描述
+            style: 设计风格，默认为modern
+            **kwargs: 可选参数，包含 conversation_context
+            
+        Yields:
+            字典，包含状态信息、最终结果或错误.
+            Example status: {"type": "status", "message": "Generating design..."}
+            Example final: {"type": "final_result", "status": "success", "file_path": ..., ...}
+            Example error: {"type": "error", "error": "..."}
+        """
+        if not self.api_key:
+            yield {"type": "error", "error": "Design Generator API key not configured. Call configure() first."}
+            return
+        
+        # 确保输出目录存在
+        if not os.path.isdir(self.output_dir):
+             yield {"type": "error", "error": f"Output directory '{self.output_dir}' does not exist or is not a directory."}
+             return
+
+        conversation_context = kwargs.get("conversation_context")
+
+        # 构建提示词
+        context_str = ""
+        if conversation_context:
+            # Maybe summarize context or extract key elements for the design prompt?
+            # For now, just add a note, as full context might be too long for image models.
+            context_str = f" (Consider recent conversation context)"
+            
+        prompt = f"Generate a {style} {design_type} based on the following description: {description}{context_str}. Ensure high quality and relevance to the request."
+        
+        # Ensure prompt is within reasonable limits if needed
+        prompt = prompt[:1000] # Example limit for DALL-E
+
+        n_images = 1 # Number of images to generate
+        yield {"type": "status", "message": f"Generating {style} {design_type} based on: '{description[:50]}...'"}
+        logger.info(f"Using DALL-E prompt: {prompt}")
+        
+        # 调用DALL-E API生成图像
+        url = "https://api.openai.com/v1/images/generations"
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
+        payload = {
+            "model": self.model,
+            "prompt": prompt,
+            "n": n_images,
+            "size": "1024x1024",
+            "response_format": "b64_json"
+        }
+        
+        try:
+            async with aiohttp.ClientSession() as session:
+                 yield {"type": "status", "message": f"Sending request to DALL-E ({self.model})..."}
+                 async with session.post(url, headers=headers, json=payload) as response:
+                    if response.status != 200:
+                        error_text = await response.text()
+                        logger.error(f"Design generation API error: {response.status}, {error_text}")
+                        yield {"type": "error", "error": f"Design generation API error: {response.status}, {error_text[:500]}..."}
+                        return
+                    
+                    yield {"type": "status", "message": "Received response, processing image data..."}
+                    data = await response.json()
+                    
+                    if "data" not in data or len(data["data"]) == 0 or "b64_json" not in data["data"][0]:
+                        logger.error(f"No valid image data received from DALL-E. Response: {data}")
+                        yield {"type": "error", "error": "No design image data generated by API."}
+                        return
+                    
+                    # 保存生成的图像
+                    image_data = data["data"][0]["b64_json"]
+                    image_binary = base64.b64decode(image_data)
+                    
+                    # 生成文件名
+                    safe_desc_part = "".join(c if c.isalnum() else '_' for c in description[:20])
+                    filename = f"{design_type}_{style}_{safe_desc_part}_{hash(description) % 10000}.png"
+                    filepath = os.path.join(self.output_dir, filename)
+                    
+                    yield {"type": "status", "message": f"Saving image to {filepath}..."}
+                    try:
+                        with open(filepath, "wb") as f:
+                            f.write(image_binary)
+                        logger.info(f"Generated design saved to: {filepath}")
+                        yield {
+                            "type": "content_chunk",
+                            "status": "success",
+                            "design_type": design_type,
+                            "style": style,
+                            "description": description,
+                            "file_path": filepath,
+                            "prompt_used": prompt,
+                            "model_used": self.model,
+                            "content": filepath
+                        }
+                    except IOError as e:
+                        logger.error(f"Failed to write design image to file '{filepath}': {e}")
+                        yield {"type": "error", "error": f"Failed to save generated design image: {e}"}
+                        
+        except aiohttp.ClientError as e:
+            logger.error(f"Network error during design generation: {str(e)}")
+            yield {"type": "error", "error": f"Network error during design generation: {str(e)}"}
+        except Exception as e:
+            logger.error(f"An unexpected error occurred during design generation: {str(e)}")
+            yield {"type": "error", "error": f"An unexpected error occurred: {str(e)}"}
+    
+    def get_schema(self) -> Dict[str, Any]:
+        """
+        获取工具的JSON Schema
+        """
+        return {
+            "type": "object",
+            "properties": {
+                "design_type": {
+                    "type": "string",
+                    "description": "设计类型，如UI、logo、海报等",
+                    "enum": ["ui", "logo", "poster", "banner", "icon", "illustration", "wireframe"]
+                },
+                "description": {
+                    "type": "string",
+                    "description": "设计需求描述"
+                },
+                "style": {
+                    "type": "string",
+                    "description": "设计风格 (e.g., modern, minimalist, cartoon, photorealistic)",
+                    "default": "modern"
+                },
+                "size": {
+                    "type": "string",
+                    "description": "生成图像的尺寸",
+                    "enum": ["1024x1024", "1792x1024", "1024x1792"],
+                    "default": "1024x1024"
+                }
+            },
+            "required": ["design_type", "description"]
+        } 

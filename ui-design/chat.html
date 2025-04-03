@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Interface - Multi-Agent Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Custom scrollbar for webkit browsers */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      /* tailwind gray-300 */
+      border-radius: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+      /* tailwind slate-400 */
+    }
+
+    body {
+      overflow: hidden;
+      /* Prevent scrolling on the body itself */
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 font-sans h-screen flex overflow-hidden">
+
+  <!-- Sidebar: Chat List -->
+  <aside class="w-80 bg-white border-r border-gray-200 flex flex-col h-screen">
+    <!-- Sidebar Header -->
+    <div class="p-4 border-b border-gray-200 flex justify-between items-center flex-shrink-0">
+      <div class="flex items-center">
+        <img
+          src="https://images.unsplash.com/photo-1527980965255-d3b416303d12?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ0OTd8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="User Avatar" class="w-10 h-10 rounded-full mr-3">
+        <h2 class="font-semibold text-lg text-gray-800">Alex's Chats</h2>
+      </div>
+      <button class="text-gray-500 hover:text-blue-600 transition duration-150">
+        <i class="fas fa-plus-circle fa-lg"></i>
+      </button>
+    </div>
+
+    <!-- Search Bar -->
+    <div class="p-4 flex-shrink-0">
+      <div class="relative">
+        <input type="text" placeholder="Search chats..."
+          class="w-full px-4 py-2 pl-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 text-sm">
+        <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+      </div>
+    </div>
+
+    <!-- Chat List Container -->
+    <div class="flex-grow overflow-y-auto">
+      <!-- Active Chat Item -->
+      <div class="flex items-center p-4 border-b border-gray-200 bg-blue-50 cursor-pointer">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1MjN8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Alice Avatar" class="w-12 h-12 rounded-full mr-3 flex-shrink-0">
+        <div class="flex-grow overflow-hidden">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-semibold text-gray-800 truncate">Alice (Designer)</h3>
+            <span class="text-xs text-gray-500 flex-shrink-0 ml-2">10:35 AM</span>
+          </div>
+          <p class="text-sm text-gray-600 truncate">Alice: Okay, I'll get the mockups ready...</p>
+        </div>
+      </div>
+      <!-- Inactive Chat Item -->
+      <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
+        <img
+          src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1NTZ8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Bob Avatar" class="w-12 h-12 rounded-full mr-3 flex-shrink-0">
+        <div class="flex-grow overflow-hidden">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-semibold text-gray-800 truncate">Bob (Product Manager)</h3>
+            <span class="text-xs text-gray-500 flex-shrink-0 ml-2">Yesterday</span>
+          </div>
+          <p class="text-sm text-gray-600 truncate">You: Let's prioritize the user login flow first.</p>
+        </div>
+      </div>
+      <!-- Another Inactive Chat Item -->
+      <div class="flex items-center p-4 border-b border-gray-200 hover:bg-gray-50 cursor-pointer">
+        <img
+          src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1ODB8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Pliman Avatar" class="w-12 h-12 rounded-full mr-3 flex-shrink-0">
+        <div class="flex-grow overflow-hidden">
+          <div class="flex justify-between items-center mb-1">
+            <h3 class="font-semibold text-gray-800 truncate">Pliman (Engineer)</h3>
+            <span class="text-xs text-gray-500 flex-shrink-0 ml-2">2 days ago</span>
+          </div>
+          <p class="text-sm text-gray-600 truncate">Pliman: The database schema is updated.</p>
+        </div>
+      </div>
+      <!-- More chat items... -->
+    </div>
+  </aside>
+
+  <!-- Main Chat Area -->
+  <main class="flex-1 flex flex-col h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+    <!-- Chat Header -->
+    <header class="bg-white border-b border-gray-200 p-4 flex justify-between items-center flex-shrink-0 shadow-sm">
+      <div class="flex items-center">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1MjN8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Alice Avatar" class="w-10 h-10 rounded-full mr-3">
+        <div>
+          <h2 class="font-semibold text-lg text-gray-800">Alice (Designer)</h2>
+          <p class="text-xs text-green-600 font-medium">Online</p>
+        </div>
+      </div>
+      <div>
+        <button
+          class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition duration-150 mr-2">
+          <i class="fas fa-search"></i>
+        </button>
+        <button
+          class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition duration-150 mr-2">
+          <i class="fas fa-cog"></i>
+        </button>
+        <button class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition duration-150">
+          <i class="fas fa-ellipsis-v"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Message Display Area -->
+    <div class="flex-grow overflow-y-auto p-6 space-y-4">
+      <!-- Agent Message -->
+      <div class="flex items-start max-w-lg">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1MjN8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Alice Avatar" class="w-8 h-8 rounded-full mr-3 mt-1 flex-shrink-0">
+        <div>
+          <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm">
+            <p class="text-sm text-gray-800">Hey Alex! I've finished the initial design concepts for the user dashboard.
+              What do you think?</p>
+          </div>
+          <span class="text-xs text-gray-500 mt-1 block">Alice - 10:30 AM</span>
+        </div>
+      </div>
+
+      <!-- User Message -->
+      <div class="flex items-start justify-end">
+        <div class="max-w-lg">
+          <div class="bg-blue-500 text-white p-3 rounded-lg rounded-br-none shadow-sm">
+            <p class="text-sm">Wow, that was fast! Let me take a look. Can you send them over?</p>
+          </div>
+          <span class="text-xs text-gray-500 mt-1 block text-right">You - 10:32 AM</span>
+        </div>
+      </div>
+
+      <!-- Agent Message with image -->
+      <div class="flex items-start max-w-lg">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1MjN8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Alice Avatar" class="w-8 h-8 rounded-full mr-3 mt-1 flex-shrink-0">
+        <div>
+          <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm space-y-2">
+            <p class="text-sm text-gray-800">Sure! Here's a preview of the main layout:</p>
+            <img
+              src="https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ2MzR8&ixlib=rb-4.0.3&q=80&w=400"
+              alt="Design Preview" class="rounded-lg max-w-xs shadow-md">
+          </div>
+          <span class="text-xs text-gray-500 mt-1 block">Alice - 10:34 AM</span>
+        </div>
+      </div>
+
+      <!-- Agent Message -->
+      <div class="flex items-start max-w-lg">
+        <img
+          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQ1MjN8&ixlib=rb-4.0.3&q=80&w=100"
+          alt="Alice Avatar" class="w-8 h-8 rounded-full mr-3 mt-1 flex-shrink-0">
+        <div>
+          <div class="bg-white p-3 rounded-lg rounded-tl-none shadow-sm">
+            <p class="text-sm text-gray-800">Okay, I'll get the mockups ready for the full flow based on your feedback.
+              Let me know if you need anything else!</p>
+          </div>
+          <span class="text-xs text-gray-500 mt-1 block">Alice - 10:35 AM</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Message Input Area -->
+    <footer class="bg-white p-4 border-t border-gray-200 flex-shrink-0 shadow-inner">
+      <div class="flex items-center space-x-3">
+        <button class="text-gray-500 hover:text-blue-600 p-2 rounded-full hover:bg-gray-100 transition duration-150">
+          <i class="fas fa-paperclip fa-lg"></i>
+        </button>
+        <input type="text" placeholder="Type your message..."
+          class="flex-grow px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 bg-gray-50">
+        <button
+          class="bg-blue-600 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-blue-700 transition duration-150 flex-shrink-0 shadow-md">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+    </footer>
+  </main>
+
+</body>
+
+</html>

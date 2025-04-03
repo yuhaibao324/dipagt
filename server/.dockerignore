@@ -1,0 +1,16 @@
+# server/.dockerignore
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.git
+.gitignore
+.pytest_cache/
+.vscode/
+.cursor/
+data/
+# Add other files/dirs to ignore if necessary 

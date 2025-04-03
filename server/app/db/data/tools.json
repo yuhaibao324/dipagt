@@ -1,0 +1,270 @@
+{
+  "tools": [
+    {
+      "name": "TavilySearch",
+      "description": "使用Tavily搜索引擎进行网络搜索，支持实时新闻和通用搜索",
+      "function_name": "tavily_search",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "搜索查询"
+          },
+          "topic": {
+            "type": "string",
+            "description": "搜索类型，news用于实时新闻，general用于通用搜索",
+            "enum": ["general", "news"],
+            "default": "general"
+          },
+          "search_depth": {
+            "type": "string",
+            "description": "搜索深度，basic为基础搜索(1 API Credit)，advanced为高级搜索(2 API Credits)",
+            "enum": ["basic", "advanced"],
+            "default": "basic"
+          },
+          "max_results": {
+            "type": "integer",
+            "description": "返回结果数量，范围0-20",
+            "default": 5
+          },
+          "include_answer": {
+            "type": "boolean",
+            "description": "是否包含AI生成的答案总结",
+            "default": false
+          }
+        },
+        "required": ["query"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "DesignGenerator",
+      "description": "生成设计方案和原型",
+      "function_name": "generate_design",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "design_type": {
+            "type": "string",
+            "description": "设计类型，如UI、logo、海报等",
+            "enum": ["ui", "logo", "poster", "banner", "icon"]
+          },
+          "description": {
+            "type": "string",
+            "description": "设计需求描述"
+          },
+          "style": {
+            "type": "string",
+            "description": "设计风格",
+            "default": "modern"
+          }
+        },
+        "required": ["design_type", "description"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "CodeWriter",
+      "description": "编写各种编程语言的代码",
+      "function_name": "write_code",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": "string",
+            "description": "编程语言",
+            "enum": [
+              "python",
+              "javascript",
+              "typescript",
+              "java",
+              "c++",
+              "go",
+              "rust",
+              "php",
+              "html",
+              "css"
+            ]
+          },
+          "task": {
+            "type": "string",
+            "description": "编程任务描述"
+          },
+          "code_style": {
+            "type": "string",
+            "description": "代码风格",
+            "default": "standard"
+          }
+        },
+        "required": ["language", "task"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "BrowserUse",
+      "description": "使用 browser-use 库实现的浏览器操作工具。可以使用自然语言来控制浏览器，无需手动指定操作序列。",
+      "function_name": "use_browser",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "task": {
+            "type": "string",
+            "description": "要执行的任务描述（使用自然语言）"
+          },
+          "url": {
+            "type": "string",
+            "description": "起始URL（可选）"
+          },
+          "model": {
+            "type": "string",
+            "description": "使用的LLM模型名称",
+            "default": "gpt-4o"
+          }
+        },
+        "required": ["task"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "WebContentFetcher",
+      "description": "获取网页内容，支持HTML解析和内容提取",
+      "function_name": "fetch_web_content",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "要获取内容的URL"
+          },
+          "selector": {
+            "type": "string",
+            "description": "CSS选择器或XPath，用于提取特定内容"
+          },
+          "extract_type": {
+            "type": "string",
+            "description": "提取类型",
+            "enum": ["text", "html", "attribute"],
+            "default": "text"
+          },
+          "attribute": {
+            "type": "string",
+            "description": "要提取的属性名称，当extract_type为attribute时使用"
+          }
+        },
+        "required": ["url"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "MCPTool",
+      "description": "从远程站点查找已有的MCP服务并调用",
+      "function_name": "use_mcp",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "service_name": {
+            "type": "string",
+            "description": "MCP服务名称"
+          },
+          "endpoint": {
+            "type": "string",
+            "description": "服务端点"
+          },
+          "parameters": {
+            "type": "object",
+            "description": "调用参数"
+          },
+          "auth_token": {
+            "type": "string",
+            "description": "认证令牌"
+          }
+        },
+        "required": ["service_name", "endpoint"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "CommandLineTool",
+      "description": "执行命令行操作",
+      "function_name": "execute_command",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "要执行的命令"
+          },
+          "working_directory": {
+            "type": "string",
+            "description": "工作目录"
+          },
+          "timeout": {
+            "type": "integer",
+            "description": "超时时间（秒）",
+            "default": 60
+          },
+          "env_vars": {
+            "type": "object",
+            "description": "环境变量"
+          }
+        },
+        "required": ["command"]
+      },
+      "is_active": true
+    },
+    {
+      "name": "Answer",
+      "description": "直接回答用户的问题，提供清晰准确的答复",
+      "function_name": "answer_question",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "用户的问题"
+          },
+          "format": {
+            "type": "string",
+            "description": "回答的格式",
+            "enum": ["text", "markdown", "html"],
+            "default": "text"
+          },
+          "style": {
+            "type": "string",
+            "description": "回答的风格",
+            "enum": ["concise", "detailed", "professional", "friendly"],
+            "default": "professional"
+          }
+        },
+        "required": []
+      },
+      "is_active": true
+    },
+    {
+      "name": "Analyze",
+      "description": "对提供的数据或文本进行分析，总结，提取关键信息、生成摘要或进行情感分析等",
+      "function_name": "analyze_data",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "string",
+            "description": "需要分析的数据或文本"
+          },
+          "analysis_type": {
+            "type": "string",
+            "description": "分析类型 (e.g., summary, keywords, sentiment)",
+            "default": "summary"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "具体的分析指令或要求（可选）"
+          }
+        },
+        "required": ["data", "analysis_type"]
+      },
+      "is_active": true
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Multi-Agent Chat</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <style>
+    /* Basic style for iframe body if needed */
+    body {
+      background-color: #f0f2f5;
+      /* Light gray background */
+    }
+  </style>
+</head>
+
+<body class="bg-cover bg-center h-screen flex items-center justify-center p-6"
+  style="background-image: url('https://images.unsplash.com/photo-1554189097-0457f06b3c89?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wzOTAzMzl8MHwxfGFsbHx8fHx8fHx8fDE3MDg2MTQwMjZ8&ixlib=rb-4.0.3&q=80&w=1080');">
+
+  <div class="bg-white bg-opacity-90 p-8 md:p-12 rounded-xl shadow-2xl w-full max-w-md text-center backdrop-blur-sm">
+    <div class="mb-8">
+      <i class="fas fa-brain text-5xl text-blue-600"></i>
+      <h1 class="text-3xl font-bold text-gray-800 mt-4">Multi-Agent Chat</h1>
+      <p class="text-gray-600 mt-2">Enter your name to begin</p>
+    </div>
+
+    <form action="#" method="POST" class="space-y-6">
+      <div>
+        <label for="owner_name" class="sr-only">Your Name</label>
+        <input id="owner_name" name="owner_name" type="text" required
+          class="appearance-none rounded-lg relative block w-full px-4 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm transition duration-150 ease-in-out"
+          placeholder="Enter your name (e.g., Alex)">
+      </div>
+
+      <div>
+        <button type="submit"
+          class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 ease-in-out shadow-md hover:shadow-lg">
+          <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+            <i
+              class="fas fa-sign-in-alt text-blue-500 group-hover:text-blue-400 h-5 w-5 transition duration-150 ease-in-out"></i>
+          </span>
+          Start Chatting
+        </button>
+      </div>
+    </form>
+    <p class="mt-6 text-center text-sm text-gray-500">
+      No account needed, just enter your name.
+    </p>
+  </div>
+
+</body>
+
+</html>

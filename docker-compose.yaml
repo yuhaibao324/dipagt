@@ -1,0 +1,131 @@
+# docker-compose.yaml
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:16 # Use a specific version
+    container_name: dipagt_postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-dipagt}
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      # Expose port 5432 if you need direct access from host, otherwise optional
+      - "${POSTGRES_PORT_HOST:-5432}:5432"
+    networks:
+      - dipagt_network
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-user} -d ${POSTGRES_DB:-dipagt}",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dipagt_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-admin@example.com}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-admin}
+      PGADMIN_CONFIG_SERVER_MODE: "False" # Allows saving server definitions
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      # You might need a servers.json file to preconfigure the connection
+      # - ./pgadmin_servers.json:/pgadmin4/servers.json # Optional
+    ports:
+      - "${PGADMIN_PORT_HOST:-5050}:80"
+    depends_on:
+      postgres:
+        condition: service_healthy # Wait for postgres to be ready
+    networks:
+      - dipagt_network
+    restart: unless-stopped
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: dipagt_qdrant
+    ports:
+      - "${QDRANT_HTTP_PORT_HOST:-6334}:6334" # HTTP API
+      - "${QDRANT_GRPC_PORT_HOST:-6333}:6333" # gRPC API
+    volumes:
+      - qdrant_storage:/qdrant/storage
+    networks:
+      - dipagt_network
+    restart: unless-stopped
+    # Add API Key via env var if needed for Qdrant Cloud or security
+    # environment:
+    #   QDRANT__SERVICE__API_KEY: ${QDRANT_API_KEY}
+
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: dipagt_server
+    depends_on:
+      postgres:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    ports:
+      - "${SERVER_PORT_HOST:-8000}:8000"
+    environment:
+      # Database connection (uses service name 'postgres')
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-dipagt}
+      POSTGRES_USER: ${POSTGRES_USER:-user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-password}
+      # Qdrant connection (uses service name 'qdrant')
+      QDRANT_URL: http://qdrant:6333 # Or 6334 if using HTTP client
+      # Add other required server environment variables (LLM keys, etc.)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      TAVILY_API_KEY: ${TAVILY_API_KEY}
+      # Add other keys like TAVILY_API_KEY etc.
+    volumes:
+      # Mount data directory if server needs to access/write persistent data outside DB
+      # - ./server/data:/app/data # Example if needed
+      - server_logs:/app/logs # Example for persistent logs
+    networks:
+      - dipagt_network
+    restart: unless-stopped
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 # Remove --reload for production
+
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+      args:
+        # Pass the backend URL during build time (can be overridden at runtime)
+        NEXT_PUBLIC_API_URL: http://server:8000 # Use service name 'server'
+    container_name: dipagt_ui
+    depends_on:
+      - server
+    ports:
+      - "${UI_PORT_HOST:-3000}:3000"
+    environment:
+      # Ensure the runtime environment variable matches the internal URL
+      NEXT_PUBLIC_API_URL: http://server:8000
+      # NEXT_TELEMETRY_DISABLED: 1 # Optional: disable Next.js telemetry
+    networks:
+      - dipagt_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  qdrant_storage:
+    driver: local
+  server_logs: # Example volume for logs
+    driver: local
+
+networks:
+  dipagt_network:
+    driver: bridge
