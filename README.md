@@ -122,6 +122,13 @@ This is the recommended way to run the entire application stack (Backend, Fronte
     docker compose down -v
     ```
 
+## TODO
+
+[] /chat refresh cannot find the page
+[] Test all tools
+[] Use complex use cases for testing, such as generating HTML reports
+[] There are still some issues with running server environment variables in docker-compose. You can use docker-compose as a database and vector database. Manually pip install -r requirements for the backend, then run fastapi; manually npm install for the frontend, then npm run dev
+
 ## Contributing
 
 1. Fork the repository
