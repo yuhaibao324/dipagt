@@ -2,6 +2,18 @@
 
 A Python-based multi-agent system that enables collaboration between different AI agents to accomplish complex tasks. The system uses PostgreSQL for data storage and Peewee as the ORM.
 
+
+一个基于Python的多代理系统，使不同的AI代理能够协作完成复杂任务。该系统使用PostgreSQL进行数据存储，并使用Peewee作为ORM。
+- 多代理协作：不同的AI代理可以合作解决复杂问题
+- 可扩展工具系统：代理可以使用各种工具，如网络搜索、代码生成等
+- 灵活数据库：PostgreSQL与Peewee ORM用于稳健的数据存储
+- 多LLM支持：集成OpenAI和Anthropic模型（根据需要更新）
+- 任务管理：支持复杂的任务层次结构和工作流程
+- 对话记忆：利用Qdrant并可能使用mem0进行上下文管理。
+- 网页用户界面：Next.js前端供用户交互。
+- 容器化部署：Docker和Docker Compose设置便于轻松部署。
+
+- 
 ## Project Structure
 
 ```
